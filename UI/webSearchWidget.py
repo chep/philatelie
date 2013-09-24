@@ -47,6 +47,7 @@ class WebSearchButton(QtGui.QPushButton):
 			stamp = self.plugin.getStamp(self.stampUrl)
 		except:
 			#TODO LOG
+			pass
 		sw = StampWidget(stamp)
 		sw.exec_()
 
