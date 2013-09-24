@@ -35,7 +35,10 @@ class StampWidget(QtGui.QDialog, stampWidget.Ui_stampWidget):
 		self.labelDescription.setText(stamp.description)
 		self.labelComment.setText(stamp.comment)
 
-		self.labelImage.setPixmap(QtGui.QPixmap(stamp.image))
+		self.labelImage.setMaximumHeight(600)
+		self.labelImage.setMaximumWidth(600)
+		self.labelImage.setPixmap(QtGui.QPixmap(stamp.image).scaled(600, 600,
+		                                                            QtCore.Qt.KeepAspectRatio))
 
 		self.labelDesigner.setText(stamp.designer)
 		self.labelEngraver.setText(stamp.engraver)
