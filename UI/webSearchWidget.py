@@ -42,7 +42,11 @@ class WebSearchButton(QtGui.QPushButton):
 
 	@QtCore.pyqtSlot()
 	def click(self):
-		stamp = self.plugin.getStamp(self.stampUrl)
+		stamp = Stamp()
+		try:
+			stamp = self.plugin.getStamp(self.stampUrl)
+		except:
+			#TODO LOG
 		sw = StampWidget(stamp)
 		sw.exec_()
 
