@@ -22,32 +22,43 @@
 
 
 class Stamp(object):
-	def __init__(self):
-		self.identifier = ""
-		self.title = " "
-		self.impFormat = " "
-		self.separationSize = " "
-		self.shape = " "
-		self.phosphoric = " "
-		self.printing = " "
-		self.color = " "
-		self.value = " "
-		self.separation = " "
-		self.issue = " "
-		self.quantity = " "
-		self.designer = " "
-		self.engraver = " "
-		self.layout = " "
-		self.credit = " "
-		self.PhilatelixNum = " "
-		self.MichelNum = " "
-		self.issueDate = " "
-		self.withdrawal = " "
-		self.group = " "
-		self.category = " "
+	def __init__(self, id = " ", title = "-", impFormat = "-",
+	             separationSize = "-", shape = "-", phosphoric = "-",
+	             printing = "-", color = "-", value = "-", separation = "-",
+	             issue = "-", quantity = "-", designer = "-", engraver = "-",
+	             layout = "-", credit = "-", PhilatelixNum = "-",
+	             MichelNum = "-", issueDate = "-", withdrawal = "-",
+	             group = "-", category = "-", image = "imageDefault.jpg",
+	             description = "-", comment = "-", ownerNew = 0,
+	             ownerStamped = 0, ownerComment = ""):
+		self.identifier = id
+		self.title = title
+		self.impFormat = impFormat
+		self.separationSize = separationSize
+		self.shape = shape
+		self.phosphoric = phosphoric
+		self.printing = printing
+		self.color = color
+		self.value = value
+		self.separation = separation
+		self.issue = issue
+		self.quantity = quantity
+		self.designer = designer
+		self.engraver = engraver
+		self.layout = layout
+		self.credit = credit
+		self.PhilatelixNum = PhilatelixNum
+		self.MichelNum = MichelNum
+		self.issueDate = issueDate
+		self.withdrawal = withdrawal
+		self.group = group
+		self.category = category
 		self.image = "imageDefault.jpg"
-		self.description = " "
-		self.comment = " "
+		self.description = description
+		self.comment = comment
+		self.ownerNew = ownerNew
+		self.ownerStamped = ownerStamped
+		self.ownerComment = ownerComment
 
 class FoundStamp(object):
 	def __init__(self, title, url, imgUrl):

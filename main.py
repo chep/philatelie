@@ -25,24 +25,23 @@ from PyQt4 import QtGui, QtCore
 import sys
 
 from stamp import *
-from UI.stampWidget import *
-from UI.webSearchWidget import *
+from UI.mainWindowWidget import *
 from plugins import wikitimbres
-
-class MainWindow(QtGui.QMainWindow):
-	def __init__(self, parent=None):
-		super(MainWindow, self).__init__(parent)
-		#s = Stamp()
-		#wikitimbres.getStamp("http://www.wikitimbres.fr/timbres/8906/1913-centenaire-du-premier-saut-en-parachute-dadolphe-pegoud",
-		#					 s)
-		#self.stampWidget = StampWidget(self, s)
-		self.webSearchWidget = WebSearchWidget(self)
-		self.setCentralWidget(self.webSearchWidget)
+from collectionManagement.collection import *
 
 
 if __name__=='__main__':
+	c = Collection()
+	s = Stamp(id = "pouet3", category="Test2", group="group", designer="designer3", engraver="engraver2", ownerNew = 1, ownerStamped = 2, issueDate = "1988-12-21")
+	c.addStamp(s)
+	s2 = Stamp(id = "pouet", category="Test2", group="group3", designer="designer", engraver="engraver", ownerNew = 1, issueDate = "2011-02-28")
+	c.addStamp(s2)
+	s3 = Stamp(id = "pouet2", category="Test", group="group2", designer="designer", engraver="engraver2", ownerStamped = 2, issueDate = "2001-08-28")
+	c.addStamp(s3)
+	s4 = Stamp(id = "pouet4", category="Test3", group="group", designer="designer3", engraver="engraver", ownerStamped = 5, issueDate = "2001-05-15")
+	c.addStamp(s4)
 	app = QtGui.QApplication(sys.argv)
-	mw = WebSearchWidget()
+	mw = MainWindowWidget(c)
 	mw.show()
 	app.exec_()
 
