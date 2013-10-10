@@ -53,7 +53,7 @@ class Stamp(object):
 		self.withdrawal = withdrawal
 		self.group = group
 		self.category = category
-		self.image = "imageDefault.jpg"
+		self.image = image
 		self.description = description
 		self.comment = comment
 		self.ownerNew = ownerNew

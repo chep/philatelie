@@ -28,17 +28,14 @@ class StampWidget(QtGui.QDialog, stampWidget.Ui_stampWidget):
 	def __init__(self, stamp, parent = None):
 		super(StampWidget, self).__init__(parent)
 		self.setupUi(self)
-		self.connect(self.pushButtonClose, QtCore.SIGNAL("clicked()"),
-		             self, QtCore.SLOT("close()"))
 
 		self.labelName.setText(stamp.title)
 		self.labelDescription.setText(stamp.description)
 		self.labelComment.setText(stamp.comment)
+		self.labelGroup.setText(stamp.group)
+		self.labelCategory.setText(stamp.category)
 
-		self.labelImage.setMaximumHeight(600)
-		self.labelImage.setMaximumWidth(600)
-		self.labelImage.setPixmap(QtGui.QPixmap(stamp.image).scaled(600, 600,
-		                                                            QtCore.Qt.KeepAspectRatio))
+		self.image = QtGui.QPixmap(stamp.image)
 
 		self.labelDesigner.setText(stamp.designer)
 		self.labelEngraver.setText(stamp.engraver)
@@ -60,3 +57,17 @@ class StampWidget(QtGui.QDialog, stampWidget.Ui_stampWidget):
 		self.labelMichel.setText(stamp.MichelNum)
 		self.labelDate.setText(stamp.issueDate)
 		self.labelWithdrawal.setText(stamp.withdrawal)
+
+		self.resizeEvent = self.onResize
+		self.paintEvent = self.onPaint
+
+
+	def onResize(self, event):
+		self.labelImage.setPixmap(self.image.scaled(self.labelImage.width(),
+		                                            self.labelImage.height(),
+		                                            QtCore.Qt.KeepAspectRatio))
+
+	def onPaint(self, event):
+		self.labelImage.setPixmap(self.image.scaled(self.labelImage.width(),
+		                                            self.labelImage.height(),
+		                                            QtCore.Qt.KeepAspectRatio))

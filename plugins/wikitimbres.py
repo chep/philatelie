@@ -92,17 +92,23 @@ def getStamp(url):
 	stamp.MichelNum = " ".join(list(temp.next_elements)[1].split())
 
 	temp = soup.find("strong", text = "Date d'émission")
-	stamp.issueDate = " ".join(list(temp.next_elements)[1].split())
+	issueDate = " ".join(list(temp.next_elements)[1].split())
+	if issueDate != "-":
+		day, month, year =[y for y in issueDate.split("-")]
+		stamp.issueDate = year + "-" + month + "-" + day
 
 	temp = soup.find("strong", text = "Date de retrait")
-	stamp.withdrawal = " ".join(list(temp.next_elements)[1].split())
+	withdrawal = " ".join(list(temp.next_elements)[1].split())
+	if withdrawal != "-":
+		day, month, year =[y for y in withdrawal.split("-")]
+		stamp.withdrawal = year + "-" + month + "-" + day
 
 	temp = soup.find("dt", text = "Groupe")
 	stamp.group = temp.next_sibling.next_sibling.string
 
 	temp = soup.find("dt", text = "Catégorie")
 #broken, html is wrong
-	stamp.category = temp.next_sibling.next_sibling.string
+	stamp.category = "none" #temp.next_sibling.next_sibling.string
 
 	image = soup.find("a", class_ = "mx-zoom")["href"]
 	stamp.image = "/tmp/" + "TempStamp.jpg"

@@ -37,6 +37,7 @@ class WebSearchButton(QtGui.QPushButton):
 		pixmap = QtGui.QPixmap(imgUrl)
 		self.setIcon(QtGui.QIcon(pixmap))
 		self.setIconSize(pixmap.size())
+		self.setFlat(True)
 		self.connect(self, QtCore.SIGNAL("clicked()"),
 		             self, QtCore.SLOT("click()"))
 
@@ -60,8 +61,6 @@ class WebSearchWidget(QtGui.QDialog, Ui_webSearchWidget):
 		self.setupUi(self)
 		self.connect(self.pushButtonSearch, QtCore.SIGNAL("clicked()"),
 		             self, QtCore.SLOT("searchSlot()"))
-		self.connect(self.pushButtonClose, QtCore.SIGNAL("clicked()"),
-		             self, QtCore.SLOT("close()"))
 		self.connect(self.spinBoxPage, QtCore.SIGNAL("valueChanged(int)"),
 		             self, QtCore.SLOT("spinBoxChange(int)"))
 		self.connect(self, QtCore.SIGNAL("startSearch()"),

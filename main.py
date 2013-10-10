@@ -32,15 +32,25 @@ from collectionManagement.collection import *
 
 if __name__=='__main__':
 	c = Collection()
-	s = Stamp(id = "pouet3", category="Test2", group="group", designer="designer3", engraver="engraver2", ownerNew = 1, ownerStamped = 2, issueDate = "1988-12-21")
+	s = Stamp(id = "pouet3", title="pouet3", category="Test2", group="group", designer="designer3", engraver="engraver2", ownerNew = 1, ownerStamped = 2, issueDate = "1988-12-21", description = "Plop")
 	c.addStamp(s)
-	s2 = Stamp(id = "pouet", category="Test2", group="group3", designer="designer", engraver="engraver", ownerNew = 1, issueDate = "2011-02-28")
+	s2 = Stamp(id = "pouet", title="pouet", category="Test2", group="group3", designer="designer", engraver="engraver", ownerNew = 1, issueDate = "2011-02-28", description = unicode(u"Description avec des accents: dédé, prêt, à l'heure"))
 	c.addStamp(s2)
-	s3 = Stamp(id = "pouet2", category="Test", group="group2", designer="designer", engraver="engraver2", ownerStamped = 2, issueDate = "2001-08-28")
+	s3 = Stamp(id = "pouet2", title="pouet2", category="Test", group="group2", designer="designer", engraver="engraver2", ownerStamped = 2, issueDate = "2001-08-28", description = "Whaou trop classe")
 	c.addStamp(s3)
-	s4 = Stamp(id = "pouet4", category="Test3", group="group", designer="designer3", engraver="engraver", ownerStamped = 5, issueDate = "2001-05-15")
+	s4 = Stamp(id = "pouet4", title="pouet4", category="Test3", group="group", designer="designer3", engraver="engraver", ownerStamped = 5, issueDate = "2001-05-15", image="/home/chep/Images/Megaman8bit.png", description = "Ceci n'est pas un megaman")
 	c.addStamp(s4)
+
+
+	#QT
 	app = QtGui.QApplication(sys.argv)
+	locale = QtCore.QLocale.system().name()
+	qtTranslator = QtCore.QTranslator()
+	if qtTranslator.load("qt_" + locale):
+		app.installTranslator(qtTranslator)
+	appTranslator = QtCore.QTranslator()
+	if appTranslator.load("philatelie_" + locale):
+		app.installTranslator(appTranslator)
 	mw = MainWindowWidget(c)
 	mw.show()
 	app.exec_()

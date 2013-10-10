@@ -3,4 +3,9 @@ clean:
 	find UI/widgets -name "*.py" -delete
 	rm *.ts
 
+pro:
+	
 
+ui:
+
+all:

@@ -75,15 +75,15 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <layout class="QGridLayout" name="gridLayoutDisplay"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
    </layout>
-   <zorder>horizontalSpacer</zorder>
-   <zorder>horizontalSpacer</zorder>
-   <zorder>frameDisplay</zorder>
-   <zorder>frameFilter</zorder>
-   <zorder>splitter</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -115,8 +115,8 @@
      <string>Edit</string>
     </property>
     <addaction name="actionCreate_new_stamp"/>
-    <addaction name="actionSearch_stamp_in_collection"/>
-    <addaction name="actionSearch_stamp_on_the_web"/>
+    <addaction name="actionSearchCollection"/>
+    <addaction name="actionSearchWeb"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -137,8 +137,8 @@
    <addaction name="actionSave"/>
    <addaction name="separator"/>
    <addaction name="actionCreate_new_stamp"/>
-   <addaction name="actionSearch_stamp_in_collection"/>
-   <addaction name="actionSearch_stamp_on_the_web"/>
+   <addaction name="actionSearchCollection"/>
+   <addaction name="actionSearchWeb"/>
    <addaction name="separator"/>
   </widget>
   <action name="actionOpen">
@@ -183,27 +183,44 @@
     <string>Create new stamp</string>
    </property>
   </action>
-  <action name="actionSearch_stamp_on_the_web">
+  <action name="actionSearchWeb">
    <property name="icon">
     <iconset resource="mainWindow.qrc">
      <normaloff>:/actions/applications-internet.png</normaloff>:/actions/applications-internet.png</iconset>
    </property>
    <property name="text">
-    <string>Search stamp on the web</string>
+    <string>Search on the web</string>
    </property>
   </action>
-  <action name="actionSearch_stamp_in_collection">
+  <action name="actionSearchCollection">
    <property name="icon">
     <iconset resource="mainWindow.qrc">
      <normaloff>:/actions/search.png</normaloff>:/actions/search.png</iconset>
    </property>
    <property name="text">
-    <string>Search stamp in collection</string>
+    <string>Search in collection</string>
    </property>
   </action>
  </widget>
  <resources>
   <include location="mainWindow.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>525</x>
+     <y>340</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

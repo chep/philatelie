@@ -117,7 +117,6 @@ class Collection(object):
 		             stamp.withdrawal, stamp.group, stamp.category, stamp.image,
 		             stamp.description, stamp.comment, stamp.ownerNew,
 		             stamp.ownerStamped, stamp.ownerComment,))
-
 		self.connection.commit()
 
 
@@ -183,7 +182,6 @@ class Collection(object):
 			rows.append(r[0])
 		return rows
 
-
 	def getAllEngraver(self):
 		cur = self.connection.cursor()
 		cur.execute("""SELECT DISTINCT engraver FROM Stamp ORDER BY engraver;""")
@@ -191,3 +189,61 @@ class Collection(object):
 		for r in cur.fetchall():
 			rows.append(r[0])
 		return rows
+
+	def getStampsYear(self, year):
+		cur = self.connection.cursor()
+		cur.execute("""SELECT * FROM Stamp WHERE strftime('%Y', issueDate) = ?;""", (str(year),))
+		result = cur.fetchall()
+		return self.result2StampList(result)
+
+	def getStampsGroup(self, group):
+		cur = self.connection.cursor()
+		cur.execute("""SELECT * FROM Stamp WHERE group_ = ?;""", (unicode(group),))
+		result = cur.fetchall()
+		return self.result2StampList(result)
+
+	def getStampsCategory(self, category):
+		cur = self.connection.cursor()
+		cur.execute("""SELECT * FROM Stamp WHERE category = ?;""", (unicode(category),))
+		result = cur.fetchall()
+		return self.result2StampList(result)
+
+	def getStampsDesigner(self, designer):
+		cur = self.connection.cursor()
+		cur.execute("""SELECT * FROM Stamp WHERE designer = ?;""", (unicode(designer),))
+		result = cur.fetchall()
+		return self.result2StampList(result)
+
+	def getStampsEngraver(self, engraver):
+		cur = self.connection.cursor()
+		cur.execute("""SELECT * FROM Stamp WHERE engraver = ?;""", (unicode(engraver),))
+		result = cur.fetchall()
+		return self.result2StampList(result)
+
+	def result2StampList(self, result):
+		list = []
+		for identifier, title, \
+		    impFormat, separationSize, \
+		    shape, phosphoric, printing, \
+		    color, value, separation, issue, \
+		    quantity, designer, \
+		    engraver, layout, \
+		    credit, philatelixNum, michelNum, \
+		    issueDate, withdrawal, \
+		    group, category, image, \
+		    description, comment, ownerNew, \
+		    ownerStamped, ownerComment in result:
+			s = Stamp(identifier, title,
+			          impFormat, separationSize,
+			          shape, phosphoric, printing,
+			          color, value, separation, issue,
+			          quantity, designer,
+			          engraver, layout,
+			          credit, philatelixNum, michelNum,
+			          issueDate, withdrawal,
+			          group, category, image,
+			          description, comment, ownerNew,
+			          ownerStamped, ownerComment)
+			list.append(s)
+		return list
+
