@@ -1,8 +1,32 @@
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2013 Cédric Chépied
+
+# Author: Cédric Chépied (cedric.chepied@gmail.com)
+# Maintainer: Cédric Chépied
+
+# This file is part of Philatelie.
+
+# Philatelie is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Philatelie is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Philatelie.  If not, see <http://www.gnu.org/licenses/>.
+
+
 from PyQt4 import QtGui, QtCore
 
 from widgets.mainWindow import *
 from webSearchWidget import *
 from collectionStampWidget import *
+from collectionManagement.collection import *
 
 filterYear = 0
 filterGroup = 1
@@ -12,7 +36,7 @@ filterEngraver = 4
 filterError = 5
 
 class StampButton(QtGui.QPushButton):
-	def __init__(self, parent, stamp):
+	def __init__(self, parent, stamp, collection):
 		super(StampButton, self).__init__(parent)
 		pixmap = QtGui.QPixmap(stamp.image).scaled(100, 100,
 		                                           QtCore.Qt.KeepAspectRatio)
@@ -20,21 +44,21 @@ class StampButton(QtGui.QPushButton):
 		self.setIconSize(pixmap.size())
 		self.setFlat(True)
 		self.stamp = stamp
-		self.connect(self, QtCore.SIGNAL("clicked()"),
-		             self, QtCore.SLOT("click()"))
+		self.collection = collection
+		self.clicked.connect(self.click)
 
 	@QtCore.pyqtSlot()
 	def click(self):
-		sw = CollectionStampWidget(self.stamp)
+		sw = CollectionStampWidget(self.stamp, self.collection)
 		sw.exec_()
 
 
 class StampFrame(QtGui.QFrame):
-	def __init__(self, stamp, parent = None):
+	def __init__(self, stamp, collection, parent = None):
 		super(StampFrame, self).__init__()
 		self.layout = QtGui.QVBoxLayout()
 		self.setLayout(self.layout)
-		button = StampButton(self, stamp)
+		button = StampButton(self, stamp, collection)
 		self.layout.addWidget(button)
 		title = QtGui.QLabel(stamp.title, self)
 		title.setWordWrap(True)
@@ -51,88 +75,111 @@ class MainWindowWidget(QtGui.QMainWindow, Ui_MainWindow):
 		self.setupUi(self)
 		self.splitter.setStretchFactor(1,1)
 		self.collection = collection
-		self.updateFilterList()
-		self.connect(self.comboBoxFilter, QtCore.SIGNAL("currentIndexChanged(int)"),
-		             self, QtCore.SLOT("updateFilterList(int)"))
-		self.connect(self.listWidgetFilter, QtCore.SIGNAL("currentRowChanged(int)"),
-		             self, QtCore.SLOT("updateStampList(int)"))
-		self.connect(self.actionSearchWeb, QtCore.SIGNAL("triggered()"),
-		             self, QtCore.SLOT("webSearch()"))
 
-	def index2Filter(self, index):
+		self.spinBoxYearMax.setVisible(False)
+		self.spinBoxYearMin.setVisible(False)
+		self.labelYear.setVisible(False)
+
+		self.updateFilters()
+
+		self.actionSearchWeb.triggered.connect(self.webSearch)
+		self.comboBoxYear.currentIndexChanged.connect(self.yearChanged)
+		self.pushButtonApply.clicked.connect(self.applyFilters)
+		self.pushButtonReset.clicked.connect(self.resetFilters)
+
+
+	def yearChanged(self, index):
 		if index == 0:
-			return filterYear
-		#group
-		elif index == 1:
-			return filterGroup
-		#category
-		elif index == 2:
-			return filterCategory
-		#Designer
-		elif index == 3:
-			return filterDesigner
-		#Engraver
+			self.spinBoxYearMax.setVisible(False)
+			self.spinBoxYearMin.setVisible(False)
+			self.labelYear.setVisible(False)
 		elif index == 4:
-			return filterEngraver
+			self.spinBoxYearMin.setVisible(True)
+			self.spinBoxYearMax.setVisible(True)
+			self.labelYear.setVisible(True)
 		else:
-			return filterError
+			self.spinBoxYearMin.setVisible(True)
+			self.spinBoxYearMax.setVisible(False)
+			self.labelYear.setVisible(False)
 
+	def updateFilters(self):
+		list = self.collection.getAllCategories()
+		for c in list:
+			self.comboBoxCategory.addItem(c)
+		list = self.collection.getAllGroups()
+		for c in list:
+			self.comboBoxGroup.addItem(c)
+		list = self.collection.getAllDesigners()
+		for c in list:
+			self.comboBoxDesigner.addItem(c)
+		list = self.collection.getAllEngraver()
+		for c in list:
+			self.comboBoxEngraver.addItem(c)
 
-	@QtCore.pyqtSlot(int)
-	def updateFilterList(self, index = 0):
-		self.listWidgetFilter.clear()
-		list = []
-		filter = self.index2Filter(index)
-		#year
-		if filter == filterYear:
-			list = self.collection.getAllYears()
-		#group
-		elif filter == filterGroup:
-			list = self.collection.getAllGroups()
-		#category
-		elif filter == filterCategory:
-			list = self.collection.getAllCategories()
-		#Designer
-		elif filter == filterDesigner:
-			list = self.collection.getAllDesigners()
-		#Engraver
-		elif filter == filterEngraver:
-			list = self.collection.getAllEngraver()
-
-		for l in list:
-			self.listWidgetFilter.addItem(l)
-
-
-	@QtCore.pyqtSlot(int)
-	def updateStampList(self, row):
+	def resetFilters(self):
 		for i in reversed(range(self.gridLayoutDisplay.count())):
-			self.gridLayoutDisplay.itemAt(i).widget().setParent(None)
-		if row < 0:
-			return
-		text = self.listWidgetFilter.item(row).text()
-		filter = self.index2Filter(self.comboBoxFilter.currentIndex())
+	 		self.gridLayoutDisplay.itemAt(i).widget().setParent(None)
+		self.comboBoxYear.setCurrentIndex(0)
+		self.comboBoxGroup.setCurrentIndex(0)
+		self.comboBoxCategory.setCurrentIndex(0)
+		self.comboBoxDesigner.setCurrentIndex(0)
+		self.comboBoxEngraver.setCurrentIndex(0)
+		self.lineEditKeyword.setText("")
 
-		list = []
-		#year
-		if filter == filterYear:
-			list = self.collection.getStampsYear(text)
-		#group
-		elif filter == filterGroup:
-			list = self.collection.getStampsGroup(text)
-		#category
-		elif filter == filterCategory:
-			list = self.collection.getStampsCategory(text)
-		#Designer
-		elif filter == filterDesigner:
-			list = self.collection.getStampsDesigner(text)
-		#Engraver
-		elif filter == filterEngraver:
-			list = self.collection.getStampsEngraver(text)
+	def applyFilters(self):
+		operation = None
+		index = self.comboBoxYear.currentIndex()
+		if index == 1:
+			operation = Operation.equal
+		elif index == 2:
+			operation = Operation.less
+		elif index == 3:
+			operation = Operation.greater
+		elif index == 4:
+			operation = Operation.between
 
+		ymin = None
+		if self.spinBoxYearMin.isVisible():
+			ymin = self.spinBoxYearMin.value()
+
+		ymax = None
+		if self.spinBoxYearMax.isVisible():
+			ymax = self.spinBoxYearMax.value()
+
+		g = unicode(self.comboBoxGroup.currentText())
+		i = self.comboBoxGroup.currentIndex()
+		if i == 0:
+			g = None
+
+		cat = unicode(self.comboBoxCategory.currentText())
+		i = self.comboBoxCategory.currentIndex()
+		if i == 0:
+			cat = None
+
+		d = unicode(self.comboBoxDesigner.currentText())
+		i = self.comboBoxDesigner.currentIndex()
+		if i == 0:
+			d = None
+
+		e = unicode(self.comboBoxEngraver.currentText())
+		i = self.comboBoxEngraver.currentIndex()
+		if i == 0:
+			e = None
+
+		kw = unicode(self.lineEditKeyword.text())
+		if kw == "":
+			kw = None
+
+		list = self.collection.getStampFilters(operation = operation, yearMin = ymin, yearMax = ymax,
+		                                       group = g, category = cat,
+		                                       designer = d, engraver = e, keyword = kw)
+
+	 	for i in reversed(range(self.gridLayoutDisplay.count())):
+	 		self.gridLayoutDisplay.itemAt(i).widget().setParent(None)
 		row = 0
 		col = 0
 		for stamp in list:
-			frame = StampFrame(stamp, self.frameDisplay)
+			frame = StampFrame(stamp, self.collection, self.frameDisplay)
 			self.gridLayoutDisplay.addWidget(frame, row, col,
 			                                 QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
 			col = (col + 1) % 5
@@ -148,7 +195,7 @@ class MainWindowWidget(QtGui.QMainWindow, Ui_MainWindow):
 		self.gridLayoutDisplay.addWidget(empty2, row + 1, 0)
 
 
-	@QtCore.pyqtSlot()
 	def webSearch(self):
-		w = WebSearchWidget()
+		w = WebSearchWidget(self.collection)
 		w.exec_()
+		self.resetFilters()

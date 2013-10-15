@@ -30,10 +30,11 @@ import plugins
 from stamp import *
 
 class WebSearchButton(QtGui.QPushButton):
-	def __init__(self, parent, stampUrl, imgUrl, plugin):
+	def __init__(self, parent, stampUrl, imgUrl, plugin, collection):
 		super(WebSearchButton, self).__init__(parent)
 		self.stampUrl = stampUrl
 		self.plugin = plugin
+		self.collection = collection
 		pixmap = QtGui.QPixmap(imgUrl)
 		self.setIcon(QtGui.QIcon(pixmap))
 		self.setIconSize(pixmap.size())
@@ -49,16 +50,17 @@ class WebSearchButton(QtGui.QPushButton):
 		except:
 			#TODO LOG
 			pass
-		sw = StampWidget(stamp)
+		sw = StampWidget(stamp, self.collection)
 		sw.exec_()
 
 
 class WebSearchWidget(QtGui.QDialog, Ui_webSearchWidget):
 	startSearch = QtCore.pyqtSignal()
 
-	def __init__(self, parent = None):
+	def __init__(self, collection, parent = None):
 		super(WebSearchWidget, self).__init__(parent)
 		self.setupUi(self)
+		self.collection = collection
 		self.connect(self.pushButtonSearch, QtCore.SIGNAL("clicked()"),
 		             self, QtCore.SLOT("searchSlot()"))
 		self.connect(self.spinBoxPage, QtCore.SIGNAL("valueChanged(int)"),
@@ -136,7 +138,7 @@ class WebSearchWidget(QtGui.QDialog, Ui_webSearchWidget):
 						f.write(chunk)
 			else:
 				image = "imageDefault.jpg"
-			button = WebSearchButton(self.scrollAreaFound, stamp.url, image, plugin)
+			button = WebSearchButton(self.scrollAreaFound, stamp.url, image, plugin, self.collection)
 			button.setMinimumHeight(200)
 			button.setMaximumWidth(300)
 			layout.addWidget(button)
@@ -147,5 +149,7 @@ class WebSearchWidget(QtGui.QDialog, Ui_webSearchWidget):
 			label.setWordWrap(True);
 			label.setText(stamp.title)
 			layout.addWidget(label)
+			QtGui.QApplication.processEvents()
 
 		self.setButtonsEnabled(True)
+

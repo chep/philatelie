@@ -1,7 +1,7 @@
 FORMS += UI/widgets/stampWidget.ui
 FORMS += UI/widgets/webSearchWidget.ui
 FORMS += UI/widgets/mainWindow.ui
-FORMS += UI/widgets/collectionStamp.ui
+FORMS += UI/widgets/collectionStampWidget.ui
 
 SOURCES += main.py
 SOURCES += stamp.py

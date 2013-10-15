@@ -26,17 +26,45 @@ import sqlite3
 from stamp import *
 
 
+CollectionVersion = "v0.1"
+
+
+class Operation():
+	equal = 0
+	less = 1
+	greater = 2
+	between = 3
+
 class Collection(object):
 	def __init__(self, file = ".philatelie/collection.db"):
 		if not os.path.exists(os.path.dirname(file)):
 			os.makedirs(os.path.dirname(file))
+		if not os.path.exists(os.path.dirname(file) + "/images"):
+			os.makedirs(os.path.dirname(file) + "/images")
 		self.connection = sqlite3.connect(file)
 		self.checkTables()
+		self.file = file
 
+	def getDirectory(self):
+		return os.path.dirname(self.file)
 
+	def getImagesDirectory(self):
+		return self.getDirectory() + "/images/"
 
 	def checkTables(self):
 		cur = self.connection.cursor()
+		cur.execute("""SELECT name FROM sqlite_master WHERE type='table' """ +
+		            """AND name='Version';""")
+		if not cur.fetchone():
+			cur.execute("""CREATE TABLE Version(number TEXT PRIMARY KEY);""")
+			cur.execute("""INSERT INTO Version VALUES(?);""", (CollectionVersion,))
+		else:
+			cur.execute("""SELECT number FROM Version;""")
+			res = cur.fetchone()
+			if not res or res[0] != CollectionVersion:
+				print "Invalid collection version: {0} instead of {1}. Exiting".format(res[0], CollectionVersion)
+				exit()
+
 		cur.execute("""SELECT name FROM sqlite_master WHERE type='table' """ +
 		            """AND name='Category';""")
 		if not cur.fetchone():
@@ -140,14 +168,14 @@ class Collection(object):
 		            "description = ?, comment = ?, ownerNew = ?, " +
 		            "ownerStamped = ?, ownerComment = ? " + 
 		            "WHERE identifier = ?;",
-		            (stamp.title, stamp.impFormat, stamp.separationSize,
-		             stamp.shape, stamp.phosphoric, stamp.printing, stamp.color,
-		             stamp.value, stamp.separation, stamp.issue, stamp.quantity,
-		             stamp.designer, stamp.engraver, stamp.layout, stamp.credit,
-		             stamp.PhilatelixNum, stamp.MichelNum, stamp.issueDate,
-		             stamp.withdrawal, stamp.group, stamp.category, stamp.image,
-		             stamp.description, stamp.comment, stamp.ownerNew,
-		             stamp.ownerStamped, stamp.ownerComment,stamp.identifier))
+		            (newStamp.title, newStamp.impFormat, newStamp.separationSize,
+		             newStamp.shape, newStamp.phosphoric, newStamp.printing, newStamp.color,
+		             newStamp.value, newStamp.separation, newStamp.issue, newStamp.quantity,
+		             newStamp.designer, newStamp.engraver, newStamp.layout, newStamp.credit,
+		             newStamp.PhilatelixNum, newStamp.MichelNum, newStamp.issueDate,
+		             newStamp.withdrawal, newStamp.group, newStamp.category, newStamp.image,
+		             newStamp.description, newStamp.comment, newStamp.ownerNew,
+		             newStamp.ownerStamped, newStamp.ownerComment,newStamp.identifier))
 		self.connection.commit()
 
 	def getAllYears(self):
@@ -198,25 +226,141 @@ class Collection(object):
 
 	def getStampsGroup(self, group):
 		cur = self.connection.cursor()
-		cur.execute("""SELECT * FROM Stamp WHERE group_ = ?;""", (unicode(group),))
+		cur.execute("""SELECT * FROM Stamp WHERE group_ = ?;""", (group,))
 		result = cur.fetchall()
 		return self.result2StampList(result)
 
 	def getStampsCategory(self, category):
 		cur = self.connection.cursor()
-		cur.execute("""SELECT * FROM Stamp WHERE category = ?;""", (unicode(category),))
+		cur.execute("""SELECT * FROM Stamp WHERE category = ?;""", (category,))
 		result = cur.fetchall()
 		return self.result2StampList(result)
 
 	def getStampsDesigner(self, designer):
 		cur = self.connection.cursor()
-		cur.execute("""SELECT * FROM Stamp WHERE designer = ?;""", (unicode(designer),))
+		cur.execute("""SELECT * FROM Stamp WHERE designer = ?;""", (designer,))
 		result = cur.fetchall()
 		return self.result2StampList(result)
 
 	def getStampsEngraver(self, engraver):
 		cur = self.connection.cursor()
-		cur.execute("""SELECT * FROM Stamp WHERE engraver = ?;""", (unicode(engraver),))
+		cur.execute("""SELECT * FROM Stamp WHERE engraver = ?;""", (engraver,))
+		result = cur.fetchall()
+		return self.result2StampList(result)
+
+	def getStampIdentifier(self, id):
+		cur = self.connection.cursor()
+		cur.execute("""SELECT * FROM Stamp WHERE identifier = ?;""", (id,))
+		result = cur.fetchone()
+		if not result == None:
+			identifier, title, \
+			impFormat, separationSize, \
+			shape, phosphoric, printing, \
+			color, value, separation, issue, \
+			quantity, designer, \
+			engraver, layout, \
+			credit, philatelixNum, michelNum, \
+			issueDate, withdrawal, \
+			group, category, image, \
+			description, comment, ownerNew, \
+			ownerStamped, ownerComment = result
+			return Stamp(identifier, title,
+			             impFormat, separationSize,
+			             shape, phosphoric, printing,
+			             color, value, separation, issue,
+			             quantity, designer,
+			             engraver, layout,
+			             credit, philatelixNum, michelNum,
+			             issueDate, withdrawal,
+			             group, category, image,
+			             description, comment, ownerNew,
+			             ownerStamped, ownerComment)
+		else:
+			return None
+
+	def getStampTitle(self, title):
+		cur = self.connection.cursor()
+		cur.execute("""SELECT * FROM Stamp WHERE title = ?;""", (unicode(title),))
+		result = cur.fetchall()
+		return self.result2StampList(result)
+
+	def getStampFilters(self, operation = None, yearMin = None, yearMax = None,
+	                    group = None, category = None, designer = None,
+	                    engraver = None, keyword = None):
+		where = False
+		params = ()
+		request = "SELECT * FROM Stamp "
+
+		if operation == Operation.equal:
+			operation = "="
+		elif operation == Operation.less:
+			operation = "<"
+		else:
+			operation = ">="
+
+		if yearMin != None:
+			request = request + "WHERE "
+			where = True
+			request = request + "strftime('%Y', issueDate) {op} ? ".format(op = operation)
+			params = params + (str(yearMin),)
+
+		if yearMax != None:
+			if not where:
+				request = request + "WHERE "
+				where = True
+			else:
+				request = request + "AND "
+			request = request + "strftime('%Y', issueDate) < ? "
+			params = params + (str(yearMax),)
+
+		if group != None:
+			if not where:
+				request = request + "WHERE "
+				where = True
+			else:
+				request = request + "AND "
+			request = request + "group_ = ? "
+			params = params + (group,)
+
+		if category != None:
+			if not where:
+				request = request + "WHERE "
+				where = True
+			else:
+				request = request + "AND "
+			request = request + "category = ? "
+			params = params + (category,)
+
+		if designer != None:
+			if not where:
+				request = request + "WHERE "
+				where = True
+			else:
+				request = request + "AND "
+			request = request + "designer = ? "
+			params = params + (designer,)
+
+		if engraver != None:
+			if not where:
+				request = request + "WHERE "
+				where = True
+			else:
+				request = request + "AND "
+			request = request + "engraver = ? "
+			params = params + (engraver,)
+
+		if keyword != None:
+			if not where:
+				request = request + "WHERE "
+				where = True
+			else:
+				request = request + "AND "
+			request = request + "title LIKE ? "
+			params = params + ("%" + keyword + "%",)
+
+		request = request + ";"
+		cur = self.connection.cursor()
+		cur.execute(request, params)
 		result = cur.fetchall()
 		return self.result2StampList(result)
 
