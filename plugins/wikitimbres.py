@@ -107,8 +107,8 @@ def getStamp(url):
 	stamp.group = temp.next_sibling.next_sibling.string
 
 	temp = soup.find("dt", text = "Catégorie")
-#broken, html is wrong
-	stamp.category = "none" #temp.next_sibling.next_sibling.string
+#broken, html is wrong. This is an ugly fix
+	stamp.category = temp.next_element.next_element.next_element.next_element
 
 	image = soup.find("a", class_ = "mx-zoom")["href"]
 	stamp.image = "/tmp/" + "TempStamp.jpg"
