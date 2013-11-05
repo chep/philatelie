@@ -136,7 +136,7 @@ class WebSearchWidget(QtGui.QDialog, Ui_webSearchWidget):
 			r = requests.get(stamp.imgUrl)
 			image = "/tmp/stampImage" + str(count) + ".jpg"
 			if r.status_code == 200:
-				with open(image, 'w') as f:
+				with open(image, 'wb') as f:
 					for chunk in r.iter_content():
 						f.write(chunk)
 			else:
