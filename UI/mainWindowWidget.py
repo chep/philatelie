@@ -103,20 +103,37 @@ class MainWindowWidget(QtGui.QMainWindow, Ui_MainWindow):
 			self.labelYear.setVisible(False)
 
 	def updateFilters(self):
+		tmp = self.comboBoxCategory.itemText(0)
+		self.comboBoxCategory.clear()
+		self.comboBoxCategory.addItem(tmp)
 		list = self.collection.getAllCategories()
 		for c in list:
 			self.comboBoxCategory.addItem(c)
+
+		tmp = self.comboBoxGroup.itemText(0)
+		self.comboBoxGroup.clear()
+		self.comboBoxGroup.addItem(tmp)
 		list = self.collection.getAllGroups()
 		for c in list:
 			self.comboBoxGroup.addItem(c)
+
+		tmp = self.comboBoxDesigner.itemText(0)
+		self.comboBoxDesigner.clear()
+		self.comboBoxDesigner.addItem(tmp)
 		list = self.collection.getAllDesigners()
 		for c in list:
 			self.comboBoxDesigner.addItem(c)
+
+		tmp = self.comboBoxEngraver.itemText(0)
+		self.comboBoxEngraver.clear()
+		self.comboBoxEngraver.addItem(tmp)
 		list = self.collection.getAllEngraver()
 		for c in list:
 			self.comboBoxEngraver.addItem(c)
 
+
 	def resetFilters(self):
+		self.updateFilters()
 		for i in reversed(range(self.gridLayoutDisplay.count())):
 	 		self.gridLayoutDisplay.itemAt(i).widget().setParent(None)
 		self.comboBoxYear.setCurrentIndex(0)
