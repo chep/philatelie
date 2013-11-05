@@ -602,7 +602,7 @@
     <message>
         <location filename="UI/stampWidget.py" line="174"/>
         <source>This stamp is already in your collection (double click on the identifier to open):</source>
-        <translation>Ce timbre fait parti de votre collection (double clic sur l&apos;identifiant pour ouvrir)</translation>
+        <translation>Ce timbre fait partie de votre collection (double clic sur l&apos;identifiant pour ouvrir)</translation>
     </message>
     <message>
         <location filename="UI/stampWidget.py" line="189"/>
