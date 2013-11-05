@@ -61,12 +61,10 @@ class WebSearchWidget(QtGui.QDialog, Ui_webSearchWidget):
 		super(WebSearchWidget, self).__init__(parent)
 		self.setupUi(self)
 		self.collection = collection
-		self.connect(self.pushButtonSearch, QtCore.SIGNAL("clicked()"),
-		             self, QtCore.SLOT("searchSlot()"))
-		self.connect(self.spinBoxPage, QtCore.SIGNAL("valueChanged(int)"),
-		             self, QtCore.SLOT("spinBoxChange(int)"))
-		self.connect(self, QtCore.SIGNAL("startSearch()"),
-		             self, QtCore.SLOT("search()"))
+		self.pushButtonSearch.clicked.connect(self.searchSlot)
+		self.spinBoxPage.valueChanged.connect(self.spinBoxChange)
+		self.startSearch.connect(self.search)
+		self.comboBoxPlugin.currentIndexChanged.connect(self.pluginChanged)
 
 		#plugin list
 		self.plugins = dir(plugins)
@@ -79,7 +77,6 @@ class WebSearchWidget(QtGui.QDialog, Ui_webSearchWidget):
 			if i == "wikitimbres":
 				self.comboBoxPlugin.setCurrentIndex(self.comboBoxPlugin.count() - 1)
 
-	@QtCore.pyqtSlot()
 	def searchSlot(self):
 		self.clearResult()
 		self.setButtonsEnabled(False)
@@ -95,14 +92,20 @@ class WebSearchWidget(QtGui.QDialog, Ui_webSearchWidget):
 		self.pushButtonClose.setEnabled(enabled)
 		self.pushButtonSearch.setEnabled(enabled)
 
-	@QtCore.pyqtSlot(int)
 	def spinBoxChange(self, value):
 		self.setButtonsEnabled(False)
 		self.clearResult()
 		QtGui.QApplication.processEvents()
 		self.startSearch.emit()
 
-	@QtCore.pyqtSlot()
+	def pluginChanged(self, index):
+		plugin = getattr(plugins, self.plugins[self.comboBoxPlugin.currentIndex()])
+		image = QtGui.QPixmap(plugin.getImage())
+		self.labelPluginImage.setPixmap(image)#.scaled(self.labelPluginImage.width(),
+		                                       #      self.labelPluginImage.height(),
+		                                        #     QtCore.Qt.KeepAspectRatio))
+		self.labelPluginLink.setText(plugin.getLink())
+
 	def search(self):
 		self.clearResult()
 		plugin = getattr(plugins, self.plugins[self.comboBoxPlugin.currentIndex()])

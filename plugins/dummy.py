@@ -28,3 +28,9 @@ def getStamp(url):
 
 def searchYear(year, page, stampList):
 	return 1
+
+def getImage():
+	return "imageDefault.jpg"
+
+def getLink():
+	return """<a href="http://this.is.not.a.link.com">http://this.is.not.a.link.com</a>"""

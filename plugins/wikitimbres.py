@@ -162,3 +162,10 @@ def searchYear(year, page, stampList):
 			nbPages = (int(link["href"].split("/")[-1]) / 48) + 1
 			break;
 	return nbPages
+
+
+def getImage():
+	return "plugins/wikitimbres.jpg"
+
+def getLink():
+	return """<a href="http://www.wikitimbres.fr">http://www.wikitimbres.fr</a>"""
