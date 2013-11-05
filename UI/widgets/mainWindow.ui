@@ -354,7 +354,6 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen"/>
-    <addaction name="actionSave"/>
     <addaction name="actionSave_as"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -370,7 +369,6 @@
      <string>Edit</string>
     </property>
     <addaction name="actionCreate_new_stamp"/>
-    <addaction name="actionSearchCollection"/>
     <addaction name="actionSearchWeb"/>
    </widget>
    <addaction name="menuFile"/>
@@ -389,10 +387,9 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpen"/>
-   <addaction name="actionSave"/>
+   <addaction name="actionSave_as"/>
    <addaction name="separator"/>
    <addaction name="actionCreate_new_stamp"/>
-   <addaction name="actionSearchCollection"/>
    <addaction name="actionSearchWeb"/>
    <addaction name="separator"/>
   </widget>
@@ -425,6 +422,10 @@
    </property>
   </action>
   <action name="actionSave_as">
+   <property name="icon">
+    <iconset resource="mainWindow.qrc">
+     <normaloff>:/actions/document-save.png</normaloff>:/actions/document-save.png</iconset>
+   </property>
    <property name="text">
     <string>Save as...</string>
    </property>
